@@ -11,7 +11,7 @@ import CreativeView from './components/CreativeView';
 import ChatView from './components/ChatView';
 import { StopIcon } from './components/icons';
 import { runWebSearch, runImageAnalysis, determineModelForQuery, runCreativeTask } from './services/geminiService';
-import type { WebSearchResult, ImageSearchResult, AgentType, ChatMessage } from './types';
+import type { WebSearchResult, ImageSearchResult, AgentType, ChatMessage, CustomizationSettings } from './types';
 import { GoogleGenAI, Chat } from "@google/genai";
 
 type View = 'home' | 'docs' | 'browsing' | 'deep_research' | 'results' | 'image_analysis' | 'image_results' | 'creative' | 'chat';
@@ -29,6 +29,40 @@ const App: React.FC = () => {
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+
+  const [customizationSettings, setCustomizationSettings] = useState<CustomizationSettings>(() => {
+    try {
+        const savedSettings = localStorage.getItem('customizationSettings');
+        return savedSettings ? JSON.parse(savedSettings) : {
+            backgroundUrl: 'https://i.ibb.co/Y43V0QcT/IMG-3726.png',
+            inputSize: 'large',
+            inputShape: 'rounded',
+            inputTheme: 'white',
+            language: 'en',
+        };
+    } catch (error) {
+        console.error("Failed to parse settings from localStorage", error);
+        return {
+            backgroundUrl: 'https://i.ibb.co/Y43V0QcT/IMG-3726.png',
+            inputSize: 'large',
+            inputShape: 'rounded',
+            inputTheme: 'white',
+            language: 'en',
+        };
+    }
+  });
+
+  useEffect(() => {
+      try {
+          localStorage.setItem('customizationSettings', JSON.stringify(customizationSettings));
+      } catch (error) {
+          console.error("Failed to save settings to localStorage", error);
+      }
+  }, [customizationSettings]);
+  
+  const handleSettingsChange = (newSettings: Partial<CustomizationSettings>) => {
+      setCustomizationSettings(prev => ({ ...prev, ...newSettings }));
+  };
 
   const handleSearch = useCallback(async (currentQuery: string, currentImageDataUrl: string | null, currentAgent: AgentType) => {
     if (!currentQuery.trim() && !currentImageDataUrl) return;
@@ -157,6 +191,8 @@ const App: React.FC = () => {
               handleSearch(q, img, agent);
             }}
             isLoading={isLoading}
+            settings={customizationSettings}
+            onSettingsChange={handleSettingsChange}
           />
         );
       case 'docs':

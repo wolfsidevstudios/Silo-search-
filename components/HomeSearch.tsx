@@ -1,11 +1,14 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { UpArrowIcon, SparklesIcon, PlusIcon, XIcon, LightningIcon, DiamondIcon, CheckIcon, BrainIcon, WandIcon, BookOpenIcon, ChatBubbleIcon } from './icons';
-import type { AgentType } from '../types';
+import { UpArrowIcon, SparklesIcon, PlusIcon, XIcon, LightningIcon, DiamondIcon, CheckIcon, BrainIcon, WandIcon, BookOpenIcon, ChatBubbleIcon, SettingsIcon } from './icons';
+import type { AgentType, CustomizationSettings } from '../types';
+import CustomizePanel from './CustomizePanel';
 
 interface HomeSearchProps {
   onSearch: (query: string, imageDataUrl: string | null, agent: AgentType) => void;
   isLoading: boolean;
+  settings: CustomizationSettings;
+  onSettingsChange: (newSettings: Partial<CustomizationSettings>) => void;
 }
 
 const AgentSelectorPopup: React.FC<{ 
@@ -77,11 +80,12 @@ const AgentSelectorPopup: React.FC<{
 };
 
 
-const HomeSearch: React.FC<HomeSearchProps> = ({ onSearch, isLoading }) => {
+const HomeSearch: React.FC<HomeSearchProps> = ({ onSearch, isLoading, settings, onSettingsChange }) => {
   const [query, setQuery] = useState('');
   const [imageDataUrl, setImageDataUrl] = useState<string | null>(null);
   const [agent, setAgent] = useState<AgentType>('auto');
   const [showAgentSelector, setShowAgentSelector] = useState(false);
+  const [isCustomizePanelOpen, setIsCustomizePanelOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [currentTime, setCurrentTime] = useState(
     new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -132,6 +136,57 @@ const HomeSearch: React.FC<HomeSearchProps> = ({ onSearch, isLoading }) => {
         default: return 'Agent';
     }
   }
+  
+  const themeStyles = {
+    white: {
+        form: 'bg-white border-gray-200',
+        text: 'text-gray-900 placeholder-gray-500',
+        icon: 'text-gray-500 hover:text-gray-800',
+        divider: 'bg-gray-200',
+        agentButton: 'bg-gray-100 text-gray-700 hover:bg-gray-200',
+    },
+    transparent: {
+        form: 'bg-white/10 backdrop-blur-md border-white/20',
+        text: 'text-white placeholder-gray-200',
+        icon: 'text-gray-200 hover:text-white',
+        divider: 'bg-white/20',
+        agentButton: 'bg-white/10 text-white hover:bg-white/20',
+    },
+    black: {
+        form: 'bg-black border-gray-700',
+        text: 'text-white placeholder-gray-400',
+        icon: 'text-gray-400 hover:text-white',
+        divider: 'bg-gray-700',
+        agentButton: 'bg-gray-800 text-gray-200 hover:bg-gray-700',
+    },
+    lightGrey: {
+        form: 'bg-gray-100 border-gray-300',
+        text: 'text-gray-800 placeholder-gray-500',
+        icon: 'text-gray-500 hover:text-gray-800',
+        divider: 'bg-gray-300',
+        agentButton: 'bg-white text-gray-700 hover:bg-gray-200',
+    }
+  };
+  
+  const currentTheme = themeStyles[settings.inputTheme];
+  
+  const formClasses = [
+      'border',
+      'shadow-lg',
+      'p-4',
+      'flex',
+      'flex-col',
+      'gap-2',
+      'transition-all',
+      'focus-within:ring-2',
+      'focus-within:ring-indigo-500',
+      'focus-within:border-transparent',
+      settings.inputShape === 'rounded' ? 'rounded-2xl' : 'rounded-full',
+      currentTheme.form
+    ].join(' ');
+    
+  const textareaRows = settings.inputSize === 'large' ? 3 : 1;
+
 
   return (
     <>
@@ -140,12 +195,25 @@ const HomeSearch: React.FC<HomeSearchProps> = ({ onSearch, isLoading }) => {
       selectedAgent={agent}
       onSelect={setAgent}
     />}
+     <CustomizePanel
+        isOpen={isCustomizePanelOpen}
+        onClose={() => setIsCustomizePanelOpen(false)}
+        settings={settings}
+        onSettingsChange={onSettingsChange}
+    />
     <div 
       className="flex-grow flex flex-col justify-between items-center p-4 sm:p-6 lg:p-8 w-full bg-cover bg-center"
-      style={{ backgroundImage: "url('https://i.ibb.co/Y43V0QcT/IMG-3726.png')" }}
+      style={{ backgroundImage: `url('${settings.backgroundUrl}')` }}
     >
-        <div className="absolute top-0 right-0 p-4 sm:p-6 lg:p-8 z-10">
+        <div className="absolute top-0 right-0 p-4 sm:p-6 lg:p-8 z-10 flex items-center gap-4">
             <p className="text-white text-lg font-semibold">{currentTime}</p>
+            <button 
+                onClick={() => setIsCustomizePanelOpen(true)}
+                className="text-white hover:text-gray-300 transition-colors"
+                aria-label="Customize page"
+            >
+                <SettingsIcon className="w-6 h-6"/>
+            </button>
         </div>
         <div className="flex-grow flex flex-col justify-center items-center w-full">
             <div className="text-center relative z-10">
@@ -158,14 +226,14 @@ const HomeSearch: React.FC<HomeSearchProps> = ({ onSearch, isLoading }) => {
         <div className="w-full max-w-2xl mx-auto">
             <form 
               onSubmit={handleSubmit} 
-              className="bg-white border border-gray-200 rounded-2xl shadow-lg p-4 flex flex-col gap-2 transition-all focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-transparent"
+              className={formClasses}
             >
               <textarea
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Let's search..."
-                  className="w-full bg-transparent focus:outline-none text-gray-900 placeholder-gray-500 text-lg resize-none"
-                  rows={3}
+                  className={`w-full bg-transparent focus:outline-none text-lg resize-none ${currentTheme.text}`}
+                  rows={textareaRows}
                   disabled={isLoading}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' && !e.shiftKey) {
@@ -184,12 +252,12 @@ const HomeSearch: React.FC<HomeSearchProps> = ({ onSearch, isLoading }) => {
                     accept="image/*"
                   />
                   {!imageDataUrl && (
-                     <button type="button" onClick={() => fileInputRef.current?.click()} className="text-gray-500 hover:text-gray-800 transition-colors" aria-label="Add image">
+                     <button type="button" onClick={() => fileInputRef.current?.click()} className={`transition-colors ${currentTheme.icon}`} aria-label="Add image">
                         <PlusIcon className="w-6 h-6" />
                      </button>
                   )}
                  
-                  <div className="w-px h-6 bg-gray-200"></div>
+                  <div className={`w-px h-6 ${currentTheme.divider}`}></div>
 
                   {imageDataUrl && (
                     <div className="relative animate-in fade-in duration-300">
@@ -205,7 +273,7 @@ const HomeSearch: React.FC<HomeSearchProps> = ({ onSearch, isLoading }) => {
                     </div>
                   )}
 
-                  <button type="button" onClick={() => setShowAgentSelector(true)} className="bg-gray-100 text-gray-700 px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors">
+                  <button type="button" onClick={() => setShowAgentSelector(true)} className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${currentTheme.agentButton}`}>
                     {getAgentButtonText()}
                   </button>
                 </div>

@@ -26,3 +26,15 @@ export interface ChatMessage {
 export type SearchResult = WebSearchResult | ImageSearchResult;
 
 export type AgentType = 'auto' | 'deep_research' | 'creative';
+
+export type InputSize = 'large' | 'thin';
+export type InputShape = 'rounded' | 'pill';
+export type InputTheme = 'white' | 'transparent' | 'black' | 'lightGrey';
+
+export interface CustomizationSettings {
+  backgroundUrl: string;
+  inputSize: InputSize;
+  inputShape: InputShape;
+  inputTheme: InputTheme;
+  language: string;
+}
