@@ -113,7 +113,7 @@ const DocsView: React.FC<{ onClose: () => void }> = ({ onClose }) => {
               </OtherFeature>
             </div>
             
-            <div>
+            <div className="mb-16">
               <h2 className="text-4xl font-bold text-gray-900 mb-10 border-b pb-4">Release Notes</h2>
               <div className="relative pl-10">
                 <div className="absolute left-2.5 top-0 bottom-0 w-1 bg-gray-200 rounded-full"></div>
@@ -168,6 +168,34 @@ const DocsView: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                     <p>The first version of the agent-powered AI search browser, providing direct answers with sourced links.</p>
                 </ReleaseNote>
               </div>
+            </div>
+
+            <div className="mb-16">
+                <h2 className="text-4xl font-bold text-gray-900 mb-8 border-b pb-4">Privacy Policy</h2>
+                <div className="prose max-w-none text-gray-600 space-y-4">
+                    <p>Last updated: July 25, 2024</p>
+                    <p>Your privacy is important to us. It is Wolfsi Dev Studios' policy to respect your privacy regarding any information we may collect from you across our application.</p>
+                    <p>We only ask for personal information when we truly need it to provide a service to you. We collect it by fair and lawful means, with your knowledge and consent. We also let you know why we’re collecting it and how it will be used.</p>
+                    <p>We only retain collected information for as long as necessary to provide you with your requested service. What data we store, we’ll protect within commercially acceptable means to prevent loss and theft, as well as unauthorized access, disclosure, copying, use or modification. Customization settings are stored locally on your device and are not transmitted to our servers.</p>
+                    <p>We don’t share any personally identifying information publicly or with third-parties, except when required to by law.</p>
+                    <p>Our application may link to external sites that are not operated by us. Please be aware that we have no control over the content and practices of these sites, and cannot accept responsibility or liability for their respective privacy policies.</p>
+                    <p>You are free to refuse our request for your personal information, with the understanding that we may be unable to provide you with some of your desired services.</p>
+                </div>
+            </div>
+
+            <div className="mb-16">
+                <h2 className="text-4xl font-bold text-gray-900 mb-8 border-b pb-4">Terms of Service</h2>
+                <div className="prose max-w-none text-gray-600 space-y-4">
+                    <p>By accessing this application, you are agreeing to be bound by these terms of service, all applicable laws and regulations, and agree that you are responsible for compliance with any applicable local laws. If you do not agree with any of these terms, you are prohibited from using or accessing this site. The materials contained in this application are protected by applicable copyright and trademark law.</p>
+                    <p>Permission is granted to temporarily use the application for personal, non-commercial transitory viewing only. This is the grant of a license, not a transfer of title, and under this license you may not: modify or copy the materials; use the materials for any commercial purpose, or for any public display (commercial or non-commercial); attempt to decompile or reverse engineer any software contained on this application; remove any copyright or other proprietary notations from the materials; or transfer the materials to another person or "mirror" the materials on any other server.</p>
+                    <p>This license shall automatically terminate if you violate any of these restrictions and may be terminated by Wolfsi Dev Studios at any time.</p>
+                </div>
+            </div>
+
+            <div className="text-center pt-8 border-t border-gray-200">
+                <h3 className="text-xl font-bold text-gray-800">Developed By</h3>
+                <p className="text-gray-600 mt-2">Wolfsi Dev Studios</p>
+                <p className="text-sm text-gray-400 mt-1">Innovative AI Solutions & Digital Experiences</p>
             </div>
         </div>
       </div>

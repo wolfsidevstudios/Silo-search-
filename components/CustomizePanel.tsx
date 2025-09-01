@@ -10,6 +10,16 @@ interface CustomizePanelProps {
   onSettingsChange: (newSettings: Partial<CustomizationSettings>) => void;
 }
 
+const PREMADE_BACKGROUNDS = [
+  'https://i.ibb.co/Y43V0QcT/IMG-3726.png',
+  'https://i.ibb.co/przkDHvv/IMG-3657.png',
+  'https://i.ibb.co/HpYWCfc3/IMG-3618.png',
+  'https://i.ibb.co/zVkrppMJ/IMG-3617.png',
+  'https://i.ibb.co/TFz2dQj/IMG-3532.jpg',
+  'https://i.ibb.co/KxSYjVXM/IMG-3174.png',
+  'https://i.ibb.co/zWPns6zZ/IMG-1895.jpg',
+];
+
 const CustomizePanel: React.FC<CustomizePanelProps> = ({ isOpen, onClose, settings, onSettingsChange }) => {
   const backgroundInputRef = useRef<HTMLInputElement>(null);
 
@@ -66,6 +76,19 @@ const CustomizePanel: React.FC<CustomizePanelProps> = ({ isOpen, onClose, settin
             {/* Background Section */}
             <div>
               <h3 className="text-lg font-semibold text-gray-700 mb-3">Background</h3>
+              <div className="grid grid-cols-3 gap-2 mb-4">
+                {PREMADE_BACKGROUNDS.map(url => (
+                  <button
+                    key={url}
+                    onClick={() => onSettingsChange({ backgroundUrl: url })}
+                    className={`relative aspect-video rounded-md overflow-hidden focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${settings.backgroundUrl === url ? 'ring-2 ring-offset-2 ring-indigo-600' : ''}`}
+                    aria-label={`Select background ${PREMADE_BACKGROUNDS.indexOf(url) + 1}`}
+                  >
+                    <img src={url} alt={`Background option ${PREMADE_BACKGROUNDS.indexOf(url) + 1}`} className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-black/20 hover:bg-black/0 transition-colors"></div>
+                  </button>
+                ))}
+              </div>
               <input
                 type="file"
                 ref={backgroundInputRef}
