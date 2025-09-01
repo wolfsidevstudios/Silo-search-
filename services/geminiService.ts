@@ -2,11 +2,9 @@
 import { GoogleGenAI, GenerateContentResponse, Type } from "@google/genai";
 import type { WebSearchResult, ImageSearchResult, Source } from '../types';
 
-if (!process.env.API_KEY) {
-    throw new Error("API_KEY environment variable not set");
-}
+const API_KEY = "AIzaSyCfhKpIYjvZSjS0y61665dd0Ab2S50vtEQ";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+export const ai = new GoogleGenAI({ apiKey: API_KEY });
 
 function dataUrlToGeminiPart(dataUrl: string) {
   const [header, data] = dataUrl.split(',');

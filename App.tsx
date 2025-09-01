@@ -10,9 +10,9 @@ import DocsView from './components/DocsView';
 import CreativeView from './components/CreativeView';
 import ChatView from './components/ChatView';
 import { StopIcon } from './components/icons';
-import { runWebSearch, runImageAnalysis, determineModelForQuery, runCreativeTask } from './services/geminiService';
+import { runWebSearch, runImageAnalysis, determineModelForQuery, runCreativeTask, ai } from './services/geminiService';
 import type { WebSearchResult, ImageSearchResult, AgentType, ChatMessage, CustomizationSettings } from './types';
-import { GoogleGenAI, Chat } from "@google/genai";
+import { Chat } from "@google/genai";
 
 type View = 'home' | 'docs' | 'browsing' | 'deep_research' | 'results' | 'image_analysis' | 'image_results' | 'creative' | 'chat';
 
@@ -135,7 +135,6 @@ const App: React.FC = () => {
   const handleStartChat = () => {
     if (!webSearchResult) return;
     
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY! });
     const model = (agentType === 'creative') ? 'gemini-2.5-flash' : 'gemini-2.5-pro';
     
     const initialHistory = [
