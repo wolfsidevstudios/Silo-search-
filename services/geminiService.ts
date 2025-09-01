@@ -124,27 +124,3 @@ export async function runImageAnalysis(prompt: string, imageDataUrl: string, mod
     throw new Error("Failed to analyze the image with AI.");
   }
 }
-
-export async function generateChatBackground(): Promise<string> {
-    try {
-      const response = await ai.models.generateImages({
-          model: 'imagen-4.0-generate-001',
-          prompt: 'A serene and abstract background, digital art, calming colors, high resolution, minimalist.',
-          config: {
-            numberOfImages: 1,
-            outputMimeType: 'image/jpeg',
-            aspectRatio: '9:16',
-          },
-      });
-
-      if (!response.generatedImages || response.generatedImages.length === 0) {
-          throw new Error("No image was generated.");
-      }
-
-      const base64ImageBytes: string = response.generatedImages[0].image.imageBytes;
-      return `data:image/jpeg;base64,${base64ImageBytes}`;
-    } catch (error) {
-      console.error("Error calling Gemini API for image generation:", error);
-      throw new Error("Failed to generate background image with AI.");
-    }
-}

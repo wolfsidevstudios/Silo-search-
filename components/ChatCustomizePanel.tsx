@@ -1,8 +1,7 @@
 
-import React, { useState } from 'react';
-import { XIcon, SparklesIcon } from './icons';
+import React from 'react';
+import { XIcon } from './icons';
 import { PREMADE_BACKGROUNDS } from './CustomizePanel';
-import { generateChatBackground } from '../services/geminiService';
 import type { CustomizationSettings } from '../types';
 
 interface ChatCustomizePanelProps {
@@ -13,24 +12,6 @@ interface ChatCustomizePanelProps {
 }
 
 const ChatCustomizePanel: React.FC<ChatCustomizePanelProps> = ({ isOpen, onClose, onSettingsChange, currentBackground }) => {
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const handleGenerate = async () => {
-    setIsGenerating(true);
-    setError(null);
-    try {
-      const newImageUrl = await generateChatBackground();
-      onSettingsChange({ chatBackgroundUrl: newImageUrl });
-      onClose(); // Optional: close panel after generation
-    } catch (err) {
-      setError('Failed to generate background. Please try again.');
-      console.error(err);
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
   if (!isOpen) return null;
 
   return (
@@ -49,7 +30,7 @@ const ChatCustomizePanel: React.FC<ChatCustomizePanelProps> = ({ isOpen, onClose
         <div className="flex flex-col h-full">
             <header className="flex items-center justify-between p-4 border-b border-gray-200 flex-shrink-0">
                 <h2 id="customize-chat-panel-title" className="text-xl font-bold text-gray-800">Chat Background</h2>
-                <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-100 text-gray-500 hover:text-gray-800 transition-colors" aria-label="Close customization panel">
+                <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-100 text-gray-500 hover:bg-gray-800 transition-colors" aria-label="Close customization panel">
                 <XIcon className="w-5 h-5" />
                 </button>
             </header>
@@ -69,28 +50,6 @@ const ChatCustomizePanel: React.FC<ChatCustomizePanelProps> = ({ isOpen, onClose
                     </button>
                     ))}
                 </div>
-                </div>
-                <div className="border-t border-gray-200"></div>
-                <div>
-                <h3 className="text-lg font-semibold text-gray-700 mb-3">Generate with AI</h3>
-                <button
-                    onClick={handleGenerate}
-                    disabled={isGenerating}
-                    className="w-full flex items-center justify-center gap-2 bg-indigo-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-indigo-700 disabled:bg-indigo-400 transition-colors"
-                >
-                    {isGenerating ? (
-                    <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                        Generating...
-                    </>
-                    ) : (
-                    <>
-                        <SparklesIcon className="w-5 h-5" />
-                        Generate New
-                    </>
-                    )}
-                </button>
-                {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
                 </div>
                 <div className="border-t border-gray-200"></div>
                 <div>
