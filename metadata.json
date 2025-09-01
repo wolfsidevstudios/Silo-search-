@@ -1,5 +1,7 @@
 {
   "name": "AI Search Browser",
   "description": "An agent-powered AI search browser that provides answers with sources, built with Gemini.",
-  "requestFramePermissions": []
+  "requestFramePermissions": [
+    "microphone"
+  ]
 }

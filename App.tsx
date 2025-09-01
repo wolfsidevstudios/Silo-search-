@@ -9,12 +9,13 @@ import ImageResultsView from './components/ImageResultsView';
 import DocsView from './components/DocsView';
 import CreativeView from './components/CreativeView';
 import ChatView from './components/ChatView';
+import SiloLiveView from './components/SiloLiveView';
 import { StopIcon } from './components/icons';
 import { runWebSearch, runImageAnalysis, determineModelForQuery, runCreativeTask, ai } from './services/geminiService';
 import type { WebSearchResult, ImageSearchResult, AgentType, ChatMessage, CustomizationSettings } from './types';
 import { Chat } from "@google/genai";
 
-type View = 'home' | 'docs' | 'browsing' | 'deep_research' | 'results' | 'image_analysis' | 'image_results' | 'creative' | 'chat';
+type View = 'home' | 'docs' | 'browsing' | 'deep_research' | 'results' | 'image_analysis' | 'image_results' | 'creative' | 'chat' | 'silo_live';
 
 const App: React.FC = () => {
   const [view, setView] = useState<View>('home');
@@ -65,6 +66,11 @@ const App: React.FC = () => {
   };
 
   const handleSearch = useCallback(async (currentQuery: string, currentImageDataUrl: string | null, currentAgent: AgentType) => {
+    if (currentAgent === 'live') {
+        setView('silo_live');
+        return;
+    }
+    
     if (!currentQuery.trim() && !currentImageDataUrl) return;
     
     setQuery(currentQuery);
@@ -153,6 +159,17 @@ const App: React.FC = () => {
       { role: 'model', content: webSearchResult.text }
     ]);
     setView('chat');
+  };
+  
+  const navigateToChat = () => {
+      if (!chatSession) {
+        const newChat = ai.chats.create({
+          model: 'gemini-2.5-flash',
+        });
+        setChatSession(newChat);
+        setChatHistory([]);
+      }
+      setView('chat');
   };
 
   const handleSendChatMessage = async (message: string) => {
@@ -270,16 +287,49 @@ const App: React.FC = () => {
                 history={chatHistory}
                 onSendMessage={handleSendChatMessage}
                 isLoading={isLoading}
-                onNewSearch={handleNewSearch}
             />
         );
+      case 'silo_live':
+        return <SiloLiveView onExit={() => setView('home')} />;
       default:
         return null;
     }
   }
+  
+  const isHomeView = view === 'home';
 
   return (
     <main className="bg-white min-h-screen font-sans text-gray-800 flex flex-col relative">
+       {(isHomeView || view === 'chat') && (
+            <div className="absolute top-6 left-1/2 -translate-x-1/2 z-30">
+                <div className={`p-1 rounded-full flex items-center gap-1 border ${
+                    isHomeView 
+                    ? 'bg-black/20 backdrop-blur-md border-white/20' 
+                    : 'bg-gray-200 border-gray-300'
+                }`}>
+                    <button 
+                        onClick={handleNewSearch}
+                        className={`px-4 py-1 rounded-full text-sm font-semibold transition-colors ${
+                            isHomeView 
+                            ? 'bg-white text-black'
+                            : 'text-gray-800 hover:bg-gray-300'
+                        }`}
+                    >
+                        Search
+                    </button>
+                    <button 
+                        onClick={navigateToChat} 
+                        className={`px-4 py-1 rounded-full text-sm font-semibold transition-colors ${
+                            !isHomeView
+                            ? 'bg-black text-white'
+                            : 'text-white hover:bg-white/20'
+                        }`}
+                    >
+                        Chat
+                    </button>
+                </div>
+            </div>
+        )}
        {view === 'home' && (
         <div className="absolute top-0 left-0 p-4 sm:p-6 lg:p-8 z-20 flex items-center gap-4">
             <button onClick={() => setView('docs')} className="text-white font-semibold hover:text-gray-300 transition-colors text-lg">Docs</button>

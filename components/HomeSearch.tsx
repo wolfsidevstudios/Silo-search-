@@ -1,6 +1,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { UpArrowIcon, SparklesIcon, PlusIcon, XIcon, LightningIcon, DiamondIcon, CheckIcon, BrainIcon, WandIcon, BookOpenIcon, ChatBubbleIcon, SettingsIcon } from './icons';
+import { UpArrowIcon, SparklesIcon, PlusIcon, XIcon, LightningIcon, DiamondIcon, CheckIcon, BrainIcon, WandIcon, BookOpenIcon, ChatBubbleIcon, SettingsIcon, MicrophoneIcon, SiloLiveIcon } from './icons';
 import type { AgentType, CustomizationSettings } from '../types';
 import CustomizePanel from './CustomizePanel';
 
@@ -73,6 +73,11 @@ const AgentSelectorPopup: React.FC<{
             title="Creative Agent"
             icon={<WandIcon className="w-5 h-5"/>}
           />
+           <AgentButton 
+            agentType="live"
+            title="Silo Live"
+            icon={<MicrophoneIcon className="w-5 h-5"/>}
+          />
         </div>
       </div>
     </div>
@@ -102,8 +107,10 @@ const HomeSearch: React.FC<HomeSearchProps> = ({ onSearch, isLoading, settings, 
     e.preventDefault();
     if (!isLoading) {
       onSearch(query, imageDataUrl, agent);
-      setQuery('');
-      setImageDataUrl(null);
+      if (agent !== 'live') {
+          setQuery('');
+          setImageDataUrl(null);
+      }
     }
   };
 
@@ -127,12 +134,20 @@ const HomeSearch: React.FC<HomeSearchProps> = ({ onSearch, isLoading, settings, 
       fileInputRef.current.value = '';
     }
   }
+  
+  const handleSelectAgent = (selectedAgent: AgentType) => {
+    setAgent(selectedAgent);
+    if (selectedAgent === 'live') {
+        onSearch('', null, 'live');
+    }
+  }
 
   const getAgentButtonText = () => {
     switch (agent) {
         case 'auto': return 'S1 Mini';
         case 'deep_research': return 'Deep Research';
         case 'creative': return 'Creative Agent';
+        case 'live': return 'Silo Live';
         default: return 'Agent';
     }
   }
@@ -193,7 +208,7 @@ const HomeSearch: React.FC<HomeSearchProps> = ({ onSearch, isLoading, settings, 
     {showAgentSelector && <AgentSelectorPopup 
       onClose={() => setShowAgentSelector(false)}
       selectedAgent={agent}
-      onSelect={setAgent}
+      onSelect={handleSelectAgent}
     />}
      <CustomizePanel
         isOpen={isCustomizePanelOpen}
@@ -256,8 +271,6 @@ const HomeSearch: React.FC<HomeSearchProps> = ({ onSearch, isLoading, settings, 
                         <PlusIcon className="w-6 h-6" />
                      </button>
                   )}
-                 
-                  <div className={`w-px h-6 ${currentTheme.divider}`}></div>
 
                   {imageDataUrl && (
                     <div className="relative animate-in fade-in duration-300">
@@ -272,6 +285,17 @@ const HomeSearch: React.FC<HomeSearchProps> = ({ onSearch, isLoading, settings, 
                       </button>
                     </div>
                   )}
+
+                   <button
+                        type="button"
+                        onClick={() => handleSelectAgent('live')}
+                        className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 hover:bg-gray-300 transition-colors flex-shrink-0"
+                        aria-label="Start Silo Live"
+                    >
+                        <SiloLiveIcon className="w-6 h-6" />
+                    </button>
+                 
+                  <div className={`w-px h-6 ${currentTheme.divider}`}></div>
 
                   <button type="button" onClick={() => setShowAgentSelector(true)} className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${currentTheme.agentButton}`}>
                     {getAgentButtonText()}

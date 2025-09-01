@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import type { ChatMessage } from '../types';
-import { BackArrowIcon, UpArrowIcon, SparklesIcon } from './icons';
+import { UpArrowIcon, SparklesIcon } from './icons';
 import { CopyIcon, CheckIcon } from './icons'; // Re-using from ResultsView
 
 const CodeBlock: React.FC<{ language: string; children: string }> = ({ language, children }) => {
@@ -119,10 +119,9 @@ interface ChatViewProps {
   history: ChatMessage[];
   onSendMessage: (message: string) => void;
   isLoading: boolean;
-  onNewSearch: () => void;
 }
 
-const ChatView: React.FC<ChatViewProps> = ({ history, onSendMessage, isLoading, onNewSearch }) => {
+const ChatView: React.FC<ChatViewProps> = ({ history, onSendMessage, isLoading }) => {
   const [message, setMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -142,21 +141,8 @@ const ChatView: React.FC<ChatViewProps> = ({ history, onSendMessage, isLoading, 
 
   return (
     <div className="flex flex-col h-screen bg-white">
-      <header className="sticky top-0 z-10 bg-white/90 backdrop-blur-sm border-b border-gray-200">
-        <div className="max-w-4xl mx-auto p-4 flex items-center gap-4">
-          <button 
-            onClick={onNewSearch} 
-            className="p-2 rounded-full hover:bg-gray-100 text-gray-500 hover:text-gray-800 transition-colors"
-            title="Start a new search"
-          >
-            <BackArrowIcon className="w-5 h-5"/>
-          </button>
-          <h2 className="font-semibold text-gray-700 text-lg">Chat Mode</h2>
-        </div>
-      </header>
-
       <div className="flex-grow overflow-y-auto">
-        <div className="max-w-3xl mx-auto px-4 pt-8 pb-32 sm:px-6 lg:px-8">
+        <div className="max-w-3xl mx-auto px-4 pt-24 pb-32 sm:px-6 lg:px-8">
           <div className="space-y-8">
             {history.map((chat, index) => (
               <div key={index} className={`flex gap-4 ${chat.role === 'user' ? 'justify-end' : ''}`}>
