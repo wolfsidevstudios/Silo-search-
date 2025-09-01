@@ -37,4 +37,5 @@ export interface CustomizationSettings {
   inputShape: InputShape;
   inputTheme: InputTheme;
   language: string;
+  chatBackgroundUrl?: string;
 }

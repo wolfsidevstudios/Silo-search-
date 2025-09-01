@@ -32,24 +32,20 @@ const App: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   const [customizationSettings, setCustomizationSettings] = useState<CustomizationSettings>(() => {
+    const defaults = {
+        backgroundUrl: 'https://i.ibb.co/Y43V0QcT/IMG-3726.png',
+        inputSize: 'large',
+        inputShape: 'rounded',
+        inputTheme: 'white',
+        language: 'en',
+        chatBackgroundUrl: undefined,
+    };
     try {
         const savedSettings = localStorage.getItem('customizationSettings');
-        return savedSettings ? JSON.parse(savedSettings) : {
-            backgroundUrl: 'https://i.ibb.co/Y43V0QcT/IMG-3726.png',
-            inputSize: 'large',
-            inputShape: 'rounded',
-            inputTheme: 'white',
-            language: 'en',
-        };
+        return savedSettings ? { ...defaults, ...JSON.parse(savedSettings) } : defaults;
     } catch (error) {
         console.error("Failed to parse settings from localStorage", error);
-        return {
-            backgroundUrl: 'https://i.ibb.co/Y43V0QcT/IMG-3726.png',
-            inputSize: 'large',
-            inputShape: 'rounded',
-            inputTheme: 'white',
-            language: 'en',
-        };
+        return defaults;
     }
   });
 
@@ -86,13 +82,15 @@ const App: React.FC = () => {
       let model: string;
       if (currentAgent === 'auto') {
         if (currentImageDataUrl && !currentQuery.trim()) {
-            model = 'gemini-2.5-pro'; // Default to pro for image-only analysis
+            // FIX: Use 'gemini-2.5-flash' model as per guidelines
+            model = 'gemini-2.5-flash'; // Default to pro for image-only analysis
         } else {
             model = await determineModelForQuery(currentQuery);
         }
       } else {
         // For 'deep_research' and 'creative', use the pro model.
-        model = 'gemini-2.5-pro';
+        // FIX: Use 'gemini-2.5-flash' model as per guidelines
+        model = 'gemini-2.5-flash';
       }
 
       if (currentImageDataUrl) {
@@ -130,18 +128,19 @@ const App: React.FC = () => {
     setChatHistory([]);
     setChatSession(null);
     setView('home');
-  }
+  };
   
   const handleStop = () => {
     setIsLoading(false);
     // Add any cancellation logic for ongoing requests if the API supports it
     handleNewSearch();
-  }
+  };
 
   const handleStartChat = () => {
     if (!webSearchResult) return;
     
-    const model = (agentType === 'creative') ? 'gemini-2.5-flash' : 'gemini-2.5-pro';
+    // FIX: Use 'gemini-2.5-flash' model as per guidelines
+    const model = (agentType === 'creative') ? 'gemini-2.5-flash' : 'gemini-2.5-flash';
     
     const initialHistory = [
       { role: "user", parts: [{ text: query }] },
@@ -195,7 +194,7 @@ const App: React.FC = () => {
     if (query || imageDataUrl) {
       handleSearch(query, imageDataUrl, agentType);
     }
-  }
+  };
 
   const renderContent = () => {
     switch (view) {
@@ -287,6 +286,8 @@ const App: React.FC = () => {
                 history={chatHistory}
                 onSendMessage={handleSendChatMessage}
                 isLoading={isLoading}
+                settings={customizationSettings}
+                onSettingsChange={handleSettingsChange}
             />
         );
       case 'silo_live':
@@ -294,7 +295,7 @@ const App: React.FC = () => {
       default:
         return null;
     }
-  }
+  };
   
   const isHomeView = view === 'home';
 

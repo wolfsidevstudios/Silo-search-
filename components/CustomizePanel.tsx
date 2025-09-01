@@ -10,7 +10,7 @@ interface CustomizePanelProps {
   onSettingsChange: (newSettings: Partial<CustomizationSettings>) => void;
 }
 
-const PREMADE_BACKGROUNDS = [
+export const PREMADE_BACKGROUNDS = [
   'https://i.ibb.co/Y43V0QcT/IMG-3726.png',
   'https://i.ibb.co/przkDHvv/IMG-3657.png',
   'https://i.ibb.co/HpYWCfc3/IMG-3618.png',

@@ -2,9 +2,7 @@
 import { GoogleGenAI, GenerateContentResponse, Type } from "@google/genai";
 import type { WebSearchResult, ImageSearchResult, Source } from '../types';
 
-const API_KEY = "AIzaSyCfhKpIYjvZSjS0y61665dd0Ab2S50vtEQ";
-
-export const ai = new GoogleGenAI({ apiKey: API_KEY });
+export const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 function dataUrlToGeminiPart(dataUrl: string) {
   const [header, data] = dataUrl.split(',');
@@ -18,39 +16,9 @@ function dataUrlToGeminiPart(dataUrl: string) {
 }
 
 export async function determineModelForQuery(prompt: string): Promise<string> {
-  if (!prompt.trim()) {
-    return 'gemini-2.5-pro';
-  }
-  try {
-    const response: GenerateContentResponse = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: `Analyze the user's search query and determine the best AI model to handle it.
-      - If the query is simple, factual, or can be answered concisely, choose 'fast'.
-      - If the query is complex, requires deep reasoning, multi-step analysis, creative generation, or is abstract, choose 'pro'.
-      
-      User Query: "${prompt}"`,
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            model: {
-              type: Type.STRING,
-              enum: ['fast', 'pro'],
-              description: "The recommended model ('fast' or 'pro')."
-            }
-          },
-          required: ["model"]
-        },
-        thinkingConfig: { thinkingBudget: 0 }
-      }
-    });
-    const parsedResponse = JSON.parse(response.text);
-    return parsedResponse.model === 'pro' ? 'gemini-2.5-pro' : 'gemini-2.5-flash';
-  } catch (error) {
-    console.error("Error determining model, defaulting to flash:", error);
-    return 'gemini-2.5-flash';
-  }
+  // As per guidelines, 'gemini-2.5-flash' is the preferred model for general text tasks.
+  // Simplifying this function to always return it.
+  return 'gemini-2.5-flash';
 }
 
 export async function runWebSearch(prompt: string, model: string): Promise<WebSearchResult> {
@@ -155,4 +123,28 @@ export async function runImageAnalysis(prompt: string, imageDataUrl: string, mod
     console.error("Error calling Gemini API for image analysis:", error);
     throw new Error("Failed to analyze the image with AI.");
   }
+}
+
+export async function generateChatBackground(): Promise<string> {
+    try {
+      const response = await ai.models.generateImages({
+          model: 'imagen-4.0-generate-001',
+          prompt: 'A serene and abstract background, digital art, calming colors, high resolution, minimalist.',
+          config: {
+            numberOfImages: 1,
+            outputMimeType: 'image/jpeg',
+            aspectRatio: '9:16',
+          },
+      });
+
+      if (!response.generatedImages || response.generatedImages.length === 0) {
+          throw new Error("No image was generated.");
+      }
+
+      const base64ImageBytes: string = response.generatedImages[0].image.imageBytes;
+      return `data:image/jpeg;base64,${base64ImageBytes}`;
+    } catch (error) {
+      console.error("Error calling Gemini API for image generation:", error);
+      throw new Error("Failed to generate background image with AI.");
+    }
 }
