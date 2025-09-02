@@ -38,7 +38,6 @@ const App: React.FC = () => {
         inputShape: 'rounded',
         inputTheme: 'white',
         language: 'en',
-        chatBackgroundUrl: undefined,
     };
     try {
         const savedSettings = localStorage.getItem('customizationSettings');
@@ -286,8 +285,6 @@ const App: React.FC = () => {
                 history={chatHistory}
                 onSendMessage={handleSendChatMessage}
                 isLoading={isLoading}
-                settings={customizationSettings}
-                onSettingsChange={handleSettingsChange}
             />
         );
       case 'silo_live':

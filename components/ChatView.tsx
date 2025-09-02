@@ -1,9 +1,8 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import type { ChatMessage, CustomizationSettings } from '../types';
-import { UpArrowIcon, SparklesIcon, PaintBrushIcon } from './icons';
+import type { ChatMessage } from '../types';
+import { UpArrowIcon, SparklesIcon } from './icons';
 import { CopyIcon, CheckIcon } from './icons'; // Re-using from ResultsView
-import ChatCustomizePanel from './ChatCustomizePanel';
 
 const CodeBlock: React.FC<{ language: string; children: string }> = ({ language, children }) => {
     const [copyStatus, setCopyStatus] = useState<'idle' | 'copied'>('idle');
@@ -120,13 +119,10 @@ interface ChatViewProps {
   history: ChatMessage[];
   onSendMessage: (message: string) => void;
   isLoading: boolean;
-  settings: CustomizationSettings;
-  onSettingsChange: (newSettings: Partial<CustomizationSettings>) => void;
 }
 
-const ChatView: React.FC<ChatViewProps> = ({ history, onSendMessage, isLoading, settings, onSettingsChange }) => {
+const ChatView: React.FC<ChatViewProps> = ({ history, onSendMessage, isLoading }) => {
   const [message, setMessage] = useState('');
-  const [isCustomizePanelOpen, setIsCustomizePanelOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -144,30 +140,7 @@ const ChatView: React.FC<ChatViewProps> = ({ history, onSendMessage, isLoading, 
   };
 
   return (
-    <>
-      <ChatCustomizePanel
-        isOpen={isCustomizePanelOpen}
-        onClose={() => setIsCustomizePanelOpen(false)}
-        onSettingsChange={onSettingsChange}
-        currentBackground={settings.chatBackgroundUrl}
-      />
-      <div 
-        className="flex flex-col h-screen transition-all duration-500"
-        style={{
-          backgroundImage: settings.chatBackgroundUrl ? `url('${settings.chatBackgroundUrl}')` : 'none',
-          backgroundColor: settings.chatBackgroundUrl ? 'black' : 'white',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundAttachment: 'fixed',
-        }}
-      >
-        <button
-            onClick={() => setIsCustomizePanelOpen(true)}
-            className="absolute top-20 right-4 sm:right-6 lg:right-8 z-20 p-2 rounded-full bg-white/80 backdrop-blur-sm text-gray-700 hover:bg-white hover:text-black transition-all shadow-md"
-            aria-label="Customize chat background"
-        >
-            <PaintBrushIcon className="w-5 h-5"/>
-        </button>
+      <div className="flex flex-col h-screen bg-white">
         <div className="flex-grow overflow-y-auto">
           <div className="max-w-3xl mx-auto px-4 pt-24 pb-32 sm:px-6 lg:px-8">
             <div className="space-y-8">
@@ -181,7 +154,7 @@ const ChatView: React.FC<ChatViewProps> = ({ history, onSendMessage, isLoading, 
                   <div className={`text-base max-w-xl ${
                     chat.role === 'user' 
                       ? 'bg-gray-100 text-gray-800 rounded-2xl rounded-br-none p-4' 
-                      : 'bg-white/90 backdrop-blur-sm text-gray-800 rounded-2xl rounded-bl-none p-4 shadow-sm'
+                      : 'bg-white text-gray-800 rounded-2xl rounded-bl-none p-4 border border-gray-200'
                   }`}>
                     {formatText(chat.content)}
                   </div>
@@ -192,7 +165,7 @@ const ChatView: React.FC<ChatViewProps> = ({ history, onSendMessage, isLoading, 
                    <div className="w-8 h-8 rounded-full bg-indigo-500 text-white flex items-center justify-center flex-shrink-0 mt-1">
                       <SparklesIcon className="w-5 h-5" />
                     </div>
-                    <div className="flex items-center gap-2 text-gray-500 p-4 rounded-2xl rounded-bl-none bg-white/90 backdrop-blur-sm">
+                    <div className="flex items-center gap-2 text-gray-500 p-4 rounded-2xl rounded-bl-none bg-white border border-gray-200">
                       <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-400"></div>
                       <span>Thinking...</span>
                     </div>
@@ -203,7 +176,7 @@ const ChatView: React.FC<ChatViewProps> = ({ history, onSendMessage, isLoading, 
           </div>
         </div>
 
-        <footer className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-sm">
+        <footer className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
           <div className="max-w-3xl mx-auto p-4 sm:px-6 lg:px-8">
             <form onSubmit={handleSubmit}>
               <div className="relative">
@@ -228,7 +201,6 @@ const ChatView: React.FC<ChatViewProps> = ({ history, onSendMessage, isLoading, 
           </div>
         </footer>
       </div>
-    </>
   );
 };
 

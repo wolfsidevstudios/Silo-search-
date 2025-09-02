@@ -1,4 +1,3 @@
-
 export interface Source {
   uri: string;
   title: string;
@@ -37,5 +36,6 @@ export interface CustomizationSettings {
   inputShape: InputShape;
   inputTheme: InputTheme;
   language: string;
+  // FIX: Added chatBackgroundUrl to fix type errors in ChatCustomizePanel.tsx
   chatBackgroundUrl?: string;
 }
