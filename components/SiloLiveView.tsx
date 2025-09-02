@@ -1,17 +1,17 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { ai } from '../services/geminiService';
 import { speechToText, textToSpeech } from '../services/elevenLabsService';
 import { XIcon, PauseIcon, PlayIcon } from './icons';
-import { Chat } from "@google/genai";
+import { Chat, GoogleGenAI } from "@google/genai";
 
 interface SiloLiveViewProps {
   onExit: () => void;
+  ai: GoogleGenAI;
 }
 
 type Status = 'idle' | 'listening' | 'processing' | 'thinking' | 'speaking' | 'error';
 
-const SiloLiveView: React.FC<SiloLiveViewProps> = ({ onExit }) => {
+const SiloLiveView: React.FC<SiloLiveViewProps> = ({ onExit, ai }) => {
     const [status, setStatus] = useState<Status>('idle');
     const [isPaused, setIsPaused] = useState(true); // Start in a paused state
     const [error, setError] = useState<string | null>(null);
@@ -129,7 +129,7 @@ const SiloLiveView: React.FC<SiloLiveViewProps> = ({ onExit }) => {
                 audioPlayerRef.current = null;
             }
         };
-    }, []);
+    }, [ai]);
 
     useEffect(() => {
         if (audioPlayerRef.current) {
